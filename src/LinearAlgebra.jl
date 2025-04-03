@@ -752,10 +752,10 @@ of the problem that is solved on each processor.
     This function requires at least Julia 1.1. In Julia 1.0 it is available from
     the standard library `InteractiveUtils`.
 """
-function peakflops(n::Integer=default_peakflops_size; eltype::DataType=Float64, ntrials::Integer=3, parallel::Bool=false)
+function peakflops(n::Integer=default_peakflops_size; eltype::Type{ElType}=Float64, ntrials::Integer=3, parallel::Bool=false) where {ElType}
     t = zeros(Float64, ntrials)
     for i=1:ntrials
-        a = ones(eltype,n,n)
+        a = ones(ElType,n,n)
         t[i] = @elapsed a2 = a*a
         @assert a2[1,1] == n
     end
