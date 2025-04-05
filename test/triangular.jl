@@ -197,7 +197,7 @@ end
     @test !isdiag(UpperTriangular(rand(4, 4)))
     @test !isdiag(LowerTriangular(rand(4, 4)))
 
-    for A in [rand(4,4), zeros(4,4)]
+    for A in [rand(4,4), zeros(4,4), diagm(1=>1:3), diagm(-2=>2:3)]
         U = UpperTriangular(A)
         UA = Array(U)
         L = LowerTriangular(A)
