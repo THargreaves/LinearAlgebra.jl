@@ -196,6 +196,17 @@ end
     @test isdiag(LowerTriangular(diagm(0 => [1,2,3,4])))
     @test !isdiag(UpperTriangular(rand(4, 4)))
     @test !isdiag(LowerTriangular(rand(4, 4)))
+
+    for A in [rand(4,4), zeros(4,4)]
+        U = UpperTriangular(A)
+        UA = Array(U)
+        L = LowerTriangular(A)
+        LA = Array(L)
+        for k in -size(A,1):size(A,2)
+            @test istril(U, k) == istril(UA, k)
+            @test istriu(L, k) == istriu(LA, k)
+        end
+    end
 end
 
 # Test throwing in fallbacks for non BlasFloat/BlasComplex in A_rdiv_Bx!
