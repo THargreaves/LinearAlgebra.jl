@@ -202,9 +202,25 @@ end
         UA = Array(U)
         L = LowerTriangular(A)
         LA = Array(L)
+        UU = UnitUpperTriangular(A)
+        UUA = Array(UU)
+        UL = UnitLowerTriangular(A)
+        ULA = Array(UL)
         for k in -size(A,1):size(A,2)
             @test istril(U, k) == istril(UA, k)
             @test istriu(L, k) == istriu(LA, k)
+            @test istril(UU, k) == istril(UUA, k)
+            @test istriu(UL, k) == istriu(ULA, k)
+        end
+    end
+    for (T, f) in ((UnitUpperTriangular, istril), (UnitLowerTriangular, istriu))
+        A = Matrix{BigFloat}(undef, 2, 2)
+        isupper = T === UnitUpperTriangular
+        A[1+!isupper, 1+isupper] = 3
+        UU = T(A)
+        UUA = Array(UU)
+        for k in -size(A,1):size(A,2)
+            @test f(UU, k) == f(UUA, k)
         end
     end
 end
