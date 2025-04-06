@@ -169,9 +169,9 @@ end
                 @test mul!(similar(a), a, Diagonal(1:an))  == a.*Vector(1:an)'
 
                 @testset "different axes" begin
-                    O = OffsetArray(ones(size(a)), ntuple(_->2, ndims(a)))
-                    @test mul!(copy(O), a, 2) == OffsetArray(2a, axes(O))
-                    @test mul!(copy(O), 2, a) == OffsetArray(2a, axes(O))
+                    O = OffsetArray(similar(a), ntuple(_->2, ndims(a)))
+                    @test mul!(O, a, 2) == OffsetArray(2a, axes(O))
+                    @test mul!(O, 2, a) == OffsetArray(2a, axes(O))
                 end
             end
 
@@ -188,15 +188,17 @@ end
                 @test mul!(copy(a), a, Diagonal(1:an), 10, 100)  == 10a.*Vector(1:an)' .+ 100a
 
                 @testset "different axes" begin
-                    O = OffsetArray(ones(size(a)), ntuple(_->2, ndims(a)))
-                    @test mul!(copy(O), a, 2, 3, 4) == OffsetArray(6a .+ 4, axes(O))
-                    @test mul!(copy(O), 2, a, 3, 4) == OffsetArray(6a .+ 4, axes(O))
-                    @test mul!(copy(O), a, 2, 3, 0) == OffsetArray(6a, axes(O))
-                    @test mul!(copy(O), 2, a, 3, 0) == OffsetArray(6a, axes(O))
-                    @test mul!(copy(O), a, 2, 1, 4) == OffsetArray(2a .+ 4, axes(O))
-                    @test mul!(copy(O), 2, a, 1, 4) == OffsetArray(2a .+ 4, axes(O))
-                    @test mul!(copy(O), a, 2, 1, 0) == OffsetArray(2a, axes(O))
-                    @test mul!(copy(O), 2, a, 1, 0) == OffsetArray(2a, axes(O))
+                    if eltype(a) <: Number
+                        O = OffsetArray(ones(size(a)), ntuple(_->2, ndims(a)))
+                        @test mul!(copy(O), a, 2, 3, 4) == OffsetArray(6a .+ 4, axes(O))
+                        @test mul!(copy(O), 2, a, 3, 4) == OffsetArray(6a .+ 4, axes(O))
+                        @test mul!(copy(O), a, 2, 3, 0) == OffsetArray(6a, axes(O))
+                        @test mul!(copy(O), 2, a, 3, 0) == OffsetArray(6a, axes(O))
+                        @test mul!(copy(O), a, 2, 1, 4) == OffsetArray(2a .+ 4, axes(O))
+                        @test mul!(copy(O), 2, a, 1, 4) == OffsetArray(2a .+ 4, axes(O))
+                        @test mul!(copy(O), a, 2, 1, 0) == OffsetArray(2a, axes(O))
+                        @test mul!(copy(O), 2, a, 1, 0) == OffsetArray(2a, axes(O))
+                    end
                 end
             end
         end
