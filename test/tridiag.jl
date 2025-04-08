@@ -1172,4 +1172,16 @@ end
     end
 end
 
+@testset "SymTridiagonal from Symmetric" begin
+    S = Symmetric(reshape(1:9, 3, 3))
+    @testset "helper functions" begin
+        @test LinearAlgebra._issymmetric(S)
+        @test !LinearAlgebra._issymmetric(Array(S))
+    end
+    ST = SymTridiagonal(S)
+    @test ST == SymTridiagonal(diag(S), diag(S,1))
+    S = Symmetric(Tridiagonal(1:3, 1:4, 1:3))
+    @test convert(SymTridiagonal, S) == S
+end
+
 end # module TestTridiagonal
