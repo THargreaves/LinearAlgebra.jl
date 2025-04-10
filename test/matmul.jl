@@ -1193,4 +1193,20 @@ end
     @test all(iszero, w)
 end
 
+@testset "zero-size matmul" begin
+    A = zeros(0,2)
+    S = Symmetric(zeros(0,0))
+    @test S * A == A
+    @test A' * S == A'
+    S = Symmetric(zeros(2,2))
+    @test S * A' == A'
+    @test A * S == A
+end
+
+@testset "BlasFlag.NONE => generic_matmatmul!" begin
+    A = ones(2,2)
+    S = Symmetric(ones(2,2))
+    @test mul!(similar(A), S, A, big(1), big(0)) ≈ S * A
+end
+
 end # module TestMatmul
