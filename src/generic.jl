@@ -296,6 +296,7 @@ julia> rmul!([NaN], 0.0)
 ```
 """
 function rmul!(X::AbstractArray, s::Number)
+    isone(s) && return X
     @simd for I in eachindex(X)
         @inbounds X[I] *= s
     end
@@ -334,6 +335,7 @@ julia> lmul!(0.0, [Inf])
 ```
 """
 function lmul!(s::Number, X::AbstractArray)
+    isone(s) && return X
     @simd for I in eachindex(X)
         @inbounds X[I] = s*X[I]
     end
