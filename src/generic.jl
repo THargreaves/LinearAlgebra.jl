@@ -2093,6 +2093,7 @@ julia> copytrito!(B, A, 'L')
 function copytrito!(B::AbstractMatrix, A::AbstractMatrix, uplo::AbstractChar)
     require_one_based_indexing(A, B)
     BLAS.chkuplo(uplo)
+    B === A && return B
     m,n = size(A)
     A = Base.unalias(B, A)
     if uplo == 'U'
@@ -2114,5 +2115,10 @@ function copytrito!(B::AbstractMatrix, A::AbstractMatrix, uplo::AbstractChar)
 end
 # Forward LAPACK-compatible strided matrices to lacpy
 function copytrito!(B::StridedMatrixStride1{T}, A::StridedMatrixStride1{T}, uplo::AbstractChar) where {T<:BlasFloat}
+    require_one_based_indexing(A, B)
+    BLAS.chkuplo(uplo)
+    B === A && return B
+    A = Base.unalias(B, A)
     LAPACK.lacpy!(B, A, uplo)
+    return B
 end
