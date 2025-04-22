@@ -718,7 +718,7 @@ end
 
 function _triscale!(A::UpperTriangular, B::UpperTriangular, c::Number, _add)
     checksize1(A, B)
-    iszero(_add.alpha) && return _rmul_or_fill!(A, _add.beta)
+    _iszero_alpha(_add) && return _rmul_or_fill!(A, _add.beta)
     for j in axes(B.data,2)
         for i in firstindex(B.data,1):j
             @inbounds _modify!(_add, B.data[i,j] * c, A.data, (i,j))
@@ -728,7 +728,7 @@ function _triscale!(A::UpperTriangular, B::UpperTriangular, c::Number, _add)
 end
 function _triscale!(A::UpperTriangular, c::Number, B::UpperTriangular, _add)
     checksize1(A, B)
-    iszero(_add.alpha) && return _rmul_or_fill!(A, _add.beta)
+    _iszero_alpha(_add) && return _rmul_or_fill!(A, _add.beta)
     for j in axes(B.data,2)
         for i in firstindex(B.data,1):j
             @inbounds _modify!(_add, c * B.data[i,j], A.data, (i,j))
@@ -738,7 +738,7 @@ function _triscale!(A::UpperTriangular, c::Number, B::UpperTriangular, _add)
 end
 function _triscale!(A::UpperOrUnitUpperTriangular, B::UnitUpperTriangular, c::Number, _add)
     checksize1(A, B)
-    iszero(_add.alpha) && return _rmul_or_fill!(A, _add.beta)
+    _iszero_alpha(_add) && return _rmul_or_fill!(A, _add.beta)
     for j in axes(B.data,2)
         @inbounds _modify!(_add, c, A, (j,j))
         for i in firstindex(B.data,1):(j - 1)
@@ -749,7 +749,7 @@ function _triscale!(A::UpperOrUnitUpperTriangular, B::UnitUpperTriangular, c::Nu
 end
 function _triscale!(A::UpperOrUnitUpperTriangular, c::Number, B::UnitUpperTriangular, _add)
     checksize1(A, B)
-    iszero(_add.alpha) && return _rmul_or_fill!(A, _add.beta)
+    _iszero_alpha(_add) && return _rmul_or_fill!(A, _add.beta)
     for j in axes(B.data,2)
         @inbounds _modify!(_add, c, A, (j,j))
         for i in firstindex(B.data,1):(j - 1)
@@ -760,7 +760,7 @@ function _triscale!(A::UpperOrUnitUpperTriangular, c::Number, B::UnitUpperTriang
 end
 function _triscale!(A::LowerTriangular, B::LowerTriangular, c::Number, _add)
     checksize1(A, B)
-    iszero(_add.alpha) && return _rmul_or_fill!(A, _add.beta)
+    _iszero_alpha(_add) && return _rmul_or_fill!(A, _add.beta)
     for j in axes(B.data,2)
         for i in j:lastindex(B.data,1)
             @inbounds _modify!(_add, B.data[i,j] * c, A.data, (i,j))
@@ -770,7 +770,7 @@ function _triscale!(A::LowerTriangular, B::LowerTriangular, c::Number, _add)
 end
 function _triscale!(A::LowerTriangular, c::Number, B::LowerTriangular, _add)
     checksize1(A, B)
-    iszero(_add.alpha) && return _rmul_or_fill!(A, _add.beta)
+    _iszero_alpha(_add) && return _rmul_or_fill!(A, _add.beta)
     for j in axes(B.data,2)
         for i in j:lastindex(B.data,1)
             @inbounds _modify!(_add, c * B.data[i,j], A.data, (i,j))
@@ -780,7 +780,7 @@ function _triscale!(A::LowerTriangular, c::Number, B::LowerTriangular, _add)
 end
 function _triscale!(A::LowerOrUnitLowerTriangular, B::UnitLowerTriangular, c::Number, _add)
     checksize1(A, B)
-    iszero(_add.alpha) && return _rmul_or_fill!(A, _add.beta)
+    _iszero_alpha(_add) && return _rmul_or_fill!(A, _add.beta)
     for j in axes(B.data,2)
         @inbounds _modify!(_add, c, A, (j,j))
         for i in (j + 1):lastindex(B.data,1)
@@ -791,7 +791,7 @@ function _triscale!(A::LowerOrUnitLowerTriangular, B::UnitLowerTriangular, c::Nu
 end
 function _triscale!(A::LowerOrUnitLowerTriangular, c::Number, B::UnitLowerTriangular, _add)
     checksize1(A, B)
-    iszero(_add.alpha) && return _rmul_or_fill!(A, _add.beta)
+    _iszero_alpha(_add) && return _rmul_or_fill!(A, _add.beta)
     for j in axes(B.data,2)
         @inbounds _modify!(_add, c, A, (j,j))
         for i in (j + 1):lastindex(B.data,1)
