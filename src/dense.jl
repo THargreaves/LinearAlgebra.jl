@@ -399,8 +399,7 @@ Construct a matrix with elements of the vector as diagonal elements.
 By default, the matrix is square and its size is given by
 `length(v)`, but a non-square size `m`×`n` can be specified
 by passing `m,n` as the first arguments.
-If the diagonal of the matrix contains more elements than `v`,
-the trailing elements will be zeros.
+The diagonal will be zero-padded if necessary.
 
 # Examples
 ```jldoctest
