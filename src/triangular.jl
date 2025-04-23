@@ -1402,7 +1402,7 @@ function generic_trimatmul!(C::AbstractVecOrMat, uploc, isunitc, tfun::Function,
     @inbounds if uploc == 'U'
         if tfun === identity
             for j in axes(B,2)
-                for i in axes(B,1)
+                for i in axes(A,1)
                     Cij = (unit ? oA : A[i,i]) * B[i,j]
                     for k in i + 1:lastindex(B,1)
                         Cij += A[i,k] * B[k,j]
@@ -1424,7 +1424,7 @@ function generic_trimatmul!(C::AbstractVecOrMat, uploc, isunitc, tfun::Function,
     else # uploc == 'L'
         if tfun === identity
             for j in axes(B,2)
-                for i in reverse(axes(B,1))
+                for i in reverse(axes(A,1))
                     Cij = (unit ? oA : A[i,i]) * B[i,j]
                     for k in firstindex(B,1):i - 1
                         Cij += A[i,k] * B[k,j]
@@ -1434,7 +1434,7 @@ function generic_trimatmul!(C::AbstractVecOrMat, uploc, isunitc, tfun::Function,
             end
         else # tfun in (transpose, adjoint)
             for j in axes(B,2)
-                for i in axes(B,1)
+                for i in axes(A,2)
                     Cij = (unit ? oA : tfun(A[i,i])) * B[i,j]
                     for k in i + 1:lastindex(B,1)
                         Cij += tfun(A[k,i]) * B[k,j]
@@ -1455,7 +1455,7 @@ function generic_trimatmul!(C::AbstractVecOrMat, uploc, isunitc, ::Function, xA:
     unit = isunitc == 'U'
     @inbounds if uploc == 'U'
         for j in axes(B,2)
-            for i in axes(B,1)
+            for i in axes(A,1)
                 Cij = (unit ? oA : conj(A[i,i])) * B[i,j]
                 for k in i + 1:lastindex(B,1)
                     Cij += conj(A[i,k]) * B[k,j]
@@ -1465,7 +1465,7 @@ function generic_trimatmul!(C::AbstractVecOrMat, uploc, isunitc, ::Function, xA:
         end
     else # uploc == 'L'
         for j in axes(B,2)
-            for i in reverse(axes(B,1))
+            for i in reverse(axes(A,1))
                 Cij = (unit ? oA : conj(A[i,i])) * B[i,j]
                 for k in firstindex(B,1):i - 1
                     Cij += conj(A[i,k]) * B[k,j]
@@ -1485,7 +1485,7 @@ function generic_mattrimul!(C::AbstractMatrix, uploc, isunitc, tfun::Function, A
     @inbounds if uploc == 'U'
         if tfun === identity
             for i in axes(A,1)
-                for j in reverse(axes(A,2))
+                for j in reverse(axes(B,2))
                     Cij = A[i,j] * (unit ? oB : B[j,j])
                     for k in firstindex(A,2):j - 1
                         Cij += A[i,k] * B[k,j]
@@ -1495,7 +1495,7 @@ function generic_mattrimul!(C::AbstractMatrix, uploc, isunitc, tfun::Function, A
             end
         else # tfun in (transpose, adjoint)
             for i in axes(A,1)
-                for j in axes(A,2)
+                for j in axes(B,1)
                     Cij = A[i,j] * (unit ? oB : tfun(B[j,j]))
                     for k in j + 1:lastindex(A,2)
                         Cij += A[i,k] * tfun(B[j,k])
@@ -1507,7 +1507,7 @@ function generic_mattrimul!(C::AbstractMatrix, uploc, isunitc, tfun::Function, A
     else # uploc == 'L'
         if tfun === identity
             for i in axes(A,1)
-                for j in axes(A,2)
+                for j in axes(B,2)
                     Cij = A[i,j] * (unit ? oB : B[j,j])
                     for k in j + 1:lastindex(A,2)
                         Cij += A[i,k] * B[k,j]
@@ -1517,7 +1517,7 @@ function generic_mattrimul!(C::AbstractMatrix, uploc, isunitc, tfun::Function, A
             end
         else # tfun in (transpose, adjoint)
             for i in axes(A,1)
-                for j in reverse(axes(A,2))
+                for j in reverse(axes(B,1))
                     Cij = A[i,j] * (unit ? oB : tfun(B[j,j]))
                     for k in firstindex(A,2):j - 1
                         Cij += A[i,k] * tfun(B[j,k])
@@ -1538,7 +1538,7 @@ function generic_mattrimul!(C::AbstractMatrix, uploc, isunitc, ::Function, A::Ab
     unit = isunitc == 'U'
     @inbounds if uploc == 'U'
         for i in axes(A,1)
-            for j in reverse(axes(A,2))
+            for j in reverse(axes(B,2))
                 Cij = A[i,j] * (unit ? oB : conj(B[j,j]))
                 for k in firstindex(A,2):j - 1
                     Cij += A[i,k] * conj(B[k,j])
@@ -1548,7 +1548,7 @@ function generic_mattrimul!(C::AbstractMatrix, uploc, isunitc, ::Function, A::Ab
         end
     else # uploc == 'L'
         for i in axes(A,1)
-            for j in axes(A,2)
+            for j in axes(B,2)
                 Cij = A[i,j] * (unit ? oB : conj(B[j,j]))
                 for k in j + 1:lastindex(A,2)
                     Cij += A[i,k] * conj(B[k,j])
