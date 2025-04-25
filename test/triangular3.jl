@@ -2,6 +2,8 @@
 
 module TestTriangularComplex
 
+isdefined(Main, :pruned_old_LA) || @eval Main include("prune_old_LA.jl")
+
 using Random
 
 Random.seed!(123)
