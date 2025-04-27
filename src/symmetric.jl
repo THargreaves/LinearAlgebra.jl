@@ -266,6 +266,7 @@ Base._reverse(A::Symmetric, ::Colon) = Symmetric(reverse(A.data), A.uplo == 'U' 
 
 @propagate_inbounds function setindex!(A::Symmetric, v, i::Integer, j::Integer)
     i == j || throw(ArgumentError("Cannot set a non-diagonal index in a symmetric matrix"))
+    issymmetric(v) || throw(ArgumentError("cannot set a diagonal element of a symmetric matrix to an asymmetric value"))
     setindex!(A.data, v, i, j)
     return A
 end
@@ -276,8 +277,8 @@ Base._reverse(A::Hermitian, ::Colon) = Hermitian(reverse(A.data), A.uplo == 'U' 
 @propagate_inbounds function setindex!(A::Hermitian, v, i::Integer, j::Integer)
     if i != j
         throw(ArgumentError("Cannot set a non-diagonal index in a Hermitian matrix"))
-    elseif !isreal(v)
-        throw(ArgumentError("Cannot set a diagonal entry in a Hermitian matrix to a nonreal value"))
+    elseif !ishermitian(v)
+        throw(ArgumentError("cannot set a diagonal element of a hermitian matrix to a non-hermitian value"))
     else
         setindex!(A.data, v, i, j)
     end
