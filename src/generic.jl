@@ -1152,6 +1152,8 @@ Matrix inverse. Computes matrix `N` such that
 Computed by solving the left-division
 `N = M \\ I`.
 
+A [`SingularException`](@ref) is thrown if `M` fails to be numerically inverted.
+
 # Examples
 ```jldoctest
 julia> M = [2 5; 1 3]
