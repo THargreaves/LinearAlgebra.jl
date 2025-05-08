@@ -715,7 +715,7 @@ respectively upper and lower triangular, `P` is a permutation matrix,
 and `D` is block diagonal with 1-by-1 and 2-by-2 blocks. Note that if
 `A` is complex symmetric then `U'` and `L'` denote the unconjugated
 transposes, i.e. `transpose(U)` and `transpose(L)`. The resulting `U` or
-`L` and D are stored in-place in `A`, LAPACK style. `LD` is just a
+`L` and `D` are stored in-place in `A`, LAPACK style. `LD` is just a
 reference to `A` (that is, `LD===A`). `ipiv` stores the permutation
 information of the algorithm in LAPACK format. `info` indicates whether
 the factorization was successful and non-singular when `info==0`, or
