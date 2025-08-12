@@ -1467,6 +1467,35 @@ function inv(B::Bidiagonal{T}) where T
     return B.uplo == 'U' ? UpperTriangular(dest) : LowerTriangular(dest)
 end
 
+# cholesky-version for (sym)tridiagonal matrices
+for (T, uplo) in ((:UpperTriangular, :(:U)), (:LowerTriangular, :(:L)))
+    @eval function _chol!(A::Bidiagonal, ::Type{$T})
+        dv = real(A.dv)
+        ev = A.ev
+        n = length(dv)
+        @inbounds for i in 1:n-1
+            iszero(dv[i]) && throw(ZeroPivotException(i))
+            ev[i] /= dv[i]
+            dv[i+1] -= abs2(ev[i])*dv[i]
+            Akk = dv[i]
+            Akk, info = _chol!(Akk, UpperTriangular)
+            if info != 0
+                return $T(A), convert(BlasInt, i)
+            end
+            dv[i] = Akk
+            ev[i] *= dv[i]
+        end
+        Akk = dv[n]
+        Akk, info = _chol!(Akk, $T)
+        if info != 0
+            return $T(A), convert(BlasInt, n)
+        end
+        dv[n] = Akk
+        B = Bidiagonal(dv, ev, $uplo)
+        return $T(B), convert(BlasInt, 0)
+    end
+end
+
 # Eigensystems
 eigvals(M::Bidiagonal) = copy(M.dv)
 function eigvecs(M::Bidiagonal{T}) where T
