@@ -11,25 +11,6 @@ This package is part of the Julia standard library (stdlib).
 [codecov-img]: https://codecov.io/gh/JuliaLang/LinearAlgebra.jl/branch/master/graph/badge.svg
 [codecov-url]: https://codecov.io/gh/JuliaLang/LinearAlgebra.jl
 
-## Migrating a Pull Request (PR) from the Julia repository to this repository
-
-Since this package was split out from the main Julia repository, you might have previously made a pull request (PR) to the Julia repo. You can easily migrate such PRs to this repository using the following steps:
-
-1. Add the Julia repository (or your fork) as a new remote repository:
-   ```bash
-   git remote add juliarepo https://github.com/JuliaLang/julia
-   ```
-
-2. Fetch the commits from the Julia repository:
-   ```bash
-   git fetch juliarepo
-   ```
-
-3. Cherry-pick the relevant commits made in the Julia repository to this repository:
-   ```bash
-   git cherry-pick $JULIA_COMMIT
-   ```
-
 ## Using development versions of this package
 
 This package performs some type piracy and is also included in the sysimage, which makes using a development version slightly more complex than usual.
@@ -77,5 +58,24 @@ To use a development version of this package, you can choose one of the followin
      ```
    - Start Julia with the custom sysimage:
      ```bash
+
+## Migrating a Pull Request (PR) from the Julia repository to this repository
+
+Since this package was split out from the main Julia repository, you might have previously made a pull request (PR) to the Julia repo. You can easily migrate such PRs to this repository using the following steps:
+
+1. Add the Julia repository (or your fork) as a new remote repository:
+   ```bash
+   git remote add juliarepo https://github.com/JuliaLang/julia
+   ```
+
+2. Fetch the commits from the Julia repository:
+   ```bash
+   git fetch juliarepo
+   ```
+
+3. Cherry-pick the relevant commits made in the Julia repository to this repository:
+   ```bash
+   git cherry-pick $JULIA_COMMIT
+   ```
      julia -Jnew_sysimage.so
      ```
