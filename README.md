@@ -58,6 +58,8 @@ To use a development version of this package, you can choose one of the followin
      ```
    - Start Julia with the custom sysimage:
      ```bash
+     julia -Jnew_sysimage.so
+     ```
 
 ## Migrating a Pull Request (PR) from the Julia repository to this repository
 
@@ -77,5 +79,3 @@ Since this package was split out from the main Julia repository, you might have 
    ```bash
    git cherry-pick $JULIA_COMMIT
    ```
-     julia -Jnew_sysimage.so
-     ```
