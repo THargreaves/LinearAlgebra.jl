@@ -230,6 +230,9 @@ const SelfAdjoint = Union{SymTridiagonal{<:Real}, Symmetric{<:Real}, Hermitian}
 wrappertype(::Union{Symmetric, SymTridiagonal}) = Symmetric
 wrappertype(::Hermitian) = Hermitian
 
+hswrapperop(::Symmetric) = symmetric
+hswrapperop(::Hermitian) = hermitian
+
 nonhermitianwrappertype(::SymSymTri{<:Real}) = Symmetric
 nonhermitianwrappertype(::Hermitian{<:Real}) = Symmetric
 nonhermitianwrappertype(::Hermitian) = identity
@@ -738,27 +741,28 @@ function mul(A::AdjOrTrans{<:BlasFloat,<:StridedMatrix}, B::HermOrSym{<:BlasFloa
             convert(AbstractMatrix{T}, B))
 end
 
-function dot(x::AbstractVector, A::RealHermSymComplexHerm, y::AbstractVector)
+function dot(x::AbstractVector, A::HermOrSym, y::AbstractVector)
     require_one_based_indexing(x, y)
     n = length(x)
     (n == length(y) == size(A, 1)) || throw(DimensionMismatch())
     data = A.data
-    r = dot(zero(eltype(x)), zero(eltype(A)), zero(eltype(y)))
+    s = dot(first(x), first(A), first(y))
+    r = zero(s+s)
     iszero(n) && return r
     if A.uplo == 'U'
         @inbounds for j = 1:length(y)
-            r += dot(x[j], real(data[j,j]), y[j])
+            r += dot(x[j], hswrapperop(A)(data[j,j], :U), y[j])
             @simd for i = 1:j-1
                 Aij = data[i,j]
-                r += dot(x[i], Aij, y[j]) + dot(x[j], adjoint(Aij), y[i])
+                r += dot(x[i], Aij, y[j]) + dot(x[j], _conjugation(A)(Aij), y[i])
             end
         end
     else # A.uplo == 'L'
         @inbounds for j = 1:length(y)
-            r += dot(x[j], real(data[j,j]), y[j])
+            r += dot(x[j], hswrapperop(A)(data[j,j], :L), y[j])
             @simd for i = j+1:length(y)
                 Aij = data[i,j]
-                r += dot(x[i], Aij, y[j]) + dot(x[j], adjoint(Aij), y[i])
+                r += dot(x[i], Aij, y[j]) + dot(x[j], _conjugation(A)(Aij), y[i])
             end
         end
     end
