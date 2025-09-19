@@ -996,7 +996,8 @@ function dot(x, y) # arbitrary iterables
     return s
 end
 
-dot(x::Number, y::Number) = conj(x) * y
+# the unary + is for type promotion in the Boolean case, mimicking the reduction in usual dot
+dot(x::Number, y::Number) = +(conj(x) * y)
 
 function dot(x::AbstractArray, y::AbstractArray)
     lx = length(x)
