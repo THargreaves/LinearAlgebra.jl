@@ -27,6 +27,10 @@ if any specialized algorithms.)
 To compute the symmetric part of a real matrix, or more generally the Hermitian part `(A + A') / 2` of
 a real or complex matrix `A`, use [`hermitianpart`](@ref).
 
+The `uplo` symbol corresponding to the triangular half of `A` that is shared by the symmetric view may be
+fetched by using the function [`LinearAlgebra.uplo`](@ref). The underlying matrix `A` may be fetched from the symmetric
+view by using `parent`.
+
 # Examples
 ```jldoctest
 julia> A = [1 2 3; 4 5 6; 7 8 9]
@@ -111,6 +115,10 @@ Construct a `Hermitian` view of the upper (if `uplo = :U`) or lower (if `uplo = 
 triangle of the matrix `A`.
 
 To compute the Hermitian part of `A`, use [`hermitianpart`](@ref).
+
+The `uplo` symbol corresponding to the triangular half of `A` that is shared by the hermitian view may be
+fetched by using the function [`LinearAlgebra.uplo`](@ref). The underlying matrix `A` may be fetched from the hermitian
+view by using `parent`.
 
 # Examples
 ```jldoctest
@@ -236,6 +244,33 @@ hswrapperop(::Hermitian) = hermitian
 nonhermitianwrappertype(::SymSymTri{<:Real}) = Symmetric
 nonhermitianwrappertype(::Hermitian{<:Real}) = Symmetric
 nonhermitianwrappertype(::Hermitian) = identity
+
+"""
+    LinearAlgebra.uplo(S::Union{Symmetric, Hermitian})::Symbol
+
+Return a `Symbol` corresponding to the stored triangular half (`:U` or `:L`) in the matrix `S`,
+that is, the elements are common between `S` and `parent(S)` for that triangular half.
+
+# Example
+```jldoctest
+julia> S = Symmetric([1 2; 3 4], :U)
+2×2 Symmetric{Int64, Matrix{Int64}}:
+ 1  2
+ 2  4
+
+julia> LinearAlgebra.uplo(S)
+:U
+
+julia> H = Hermitian([1 2; 3 4], :L)
+2×2 Hermitian{Int64, Matrix{Int64}}:
+ 1  3
+ 3  4
+
+julia> LinearAlgebra.uplo(H)
+:L
+```
+"""
+uplo(S::HermOrSym) = sym_uplo(S.uplo)
 
 size(A::HermOrSym) = size(A.data)
 axes(A::HermOrSym) = axes(A.data)
