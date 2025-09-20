@@ -302,7 +302,7 @@ function show(io::IO, M::Bidiagonal)
     print(io, ", ")
     show(io, M.ev)
     print(io, ", ")
-    show(io, sym_uplo(M.uplo))
+    show(io, _sym_uplo(M.uplo))
     print(io, ")")
 end
 
