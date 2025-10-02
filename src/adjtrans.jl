@@ -61,8 +61,8 @@ struct Transpose{T,S} <: AbstractMatrix{T}
 end
 
 # basic outer constructors
-Adjoint(A) = Adjoint{Base.promote_op(adjoint,eltype(A)),typeof(A)}(A)
-Transpose(A) = Transpose{Base.promote_op(transpose,eltype(A)),typeof(A)}(A)
+Adjoint(A) = Adjoint{Base.promote_op(adjoint, eltype(A)),typeof(A)}(A)
+Transpose(A) = Transpose{Base.promote_op(transpose, eltype(A)),typeof(A)}(A)
 
 """
     inplace_adj_or_trans(::AbstractArray) -> adjoint!|transpose!|copyto!
@@ -74,21 +74,21 @@ return [`copyto!`](@ref). Note that `Adjoint` and `Transpose` have
 to be the outer-most wrapper object for a non-`identity` function to be
 returned.
 """
-inplace_adj_or_trans(::T) where {T <: AbstractArray} = inplace_adj_or_trans(T)
+inplace_adj_or_trans(::T) where {T<:AbstractArray} = inplace_adj_or_trans(T)
 inplace_adj_or_trans(::Type{<:AbstractArray}) = copyto!
 inplace_adj_or_trans(::Type{<:Adjoint}) = adjoint!
 inplace_adj_or_trans(::Type{<:Transpose}) = transpose!
 
 # unwraps Adjoint, Transpose, Symmetric, Hermitian
-_unwrap(A::Adjoint)   = parent(A)
+_unwrap(A::Adjoint) = parent(A)
 _unwrap(A::Transpose) = parent(A)
 
 # unwraps Adjoint and Transpose only
 _unwrap_at(A) = A
-_unwrap_at(A::Adjoint)   = parent(A)
+_unwrap_at(A::Adjoint) = parent(A)
 _unwrap_at(A::Transpose) = parent(A)
 
-Base.dataids(A::Union{Adjoint, Transpose}) = Base.dataids(A.parent)
+Base.dataids(A::Union{Adjoint,Transpose}) = Base.dataids(A.parent)
 Base.unaliascopy(A::Union{Adjoint,Transpose}) = typeof(A)(Base.unaliascopy(A.parent))
 
 # wrapping lowercase quasi-constructors
@@ -302,12 +302,12 @@ function Base.showarg(io::IO, v::Transpose, toplevel)
     toplevel && print(io, " with eltype ", eltype(v))
     return nothing
 end
-function Base.show(io::IO, v::Adjoint{<:Real, <:AbstractVector})
+function Base.show(io::IO, v::Adjoint{<:Real,<:AbstractVector})
     print(io, "adjoint(")
     show(io, parent(v))
     print(io, ")")
 end
-function Base.show(io::IO, v::Transpose{<:Number, <:AbstractVector})
+function Base.show(io::IO, v::Transpose{<:Number,<:AbstractVector})
     print(io, "transpose(")
     show(io, parent(v))
     print(io, ")")
@@ -339,7 +339,7 @@ axes(A::AdjOrTrans) = reverse(axes(A.parent))
 length(A::AdjOrTrans) = length(A.parent)
 size(v::AdjOrTransAbsVec) = (1, length(v.parent))
 size(A::AdjOrTransAbsMat) = reverse(size(A.parent))
-axes(v::AdjOrTransAbsVec) = (axes(v.parent,2), axes(v.parent)...)
+axes(v::AdjOrTransAbsVec) = (axes(v.parent, 2), axes(v.parent)...)
 axes(A::AdjOrTransAbsMat) = reverse(axes(A.parent))
 IndexStyle(::Type{<:AdjOrTransAbsVec}) = IndexLinear()
 @propagate_inbounds Base.isassigned(v::AdjOrTransAbsVec, i::Integer) = isassigned(v.parent, i - one(i) + first(axes(v.parent)[one(i)]))
@@ -368,17 +368,17 @@ convert(::Type{Adjoint{T,S}}, A::Adjoint) where {T,S} = Adjoint{T,S}(convert(S, 
 convert(::Type{Transpose{T,S}}, A::Transpose) where {T,S} = Transpose{T,S}(convert(S, A.parent))::Transpose{T,S}
 
 # Strides and pointer for transposed strided arrays — but only if the elements are actually stored in memory
-Base.strides(A::Adjoint{<:Real, <:AbstractVector}) = (stride(A.parent, 2), stride(A.parent, 1))
-Base.strides(A::Transpose{<:Any, <:AbstractVector}) = (stride(A.parent, 2), stride(A.parent, 1))
+Base.strides(A::Adjoint{<:Real,<:AbstractVector}) = (stride(A.parent, 2), stride(A.parent, 1))
+Base.strides(A::Transpose{<:Any,<:AbstractVector}) = (stride(A.parent, 2), stride(A.parent, 1))
 # For matrices it's slightly faster to use reverse and avoid calling stride twice
-Base.strides(A::Adjoint{<:Real, <:AbstractMatrix}) = reverse(strides(A.parent))
-Base.strides(A::Transpose{<:Any, <:AbstractMatrix}) = reverse(strides(A.parent))
+Base.strides(A::Adjoint{<:Real,<:AbstractMatrix}) = reverse(strides(A.parent))
+Base.strides(A::Transpose{<:Any,<:AbstractMatrix}) = reverse(strides(A.parent))
 
-Base.cconvert(::Type{Ptr{T}}, A::Adjoint{<:Real, <:AbstractVecOrMat}) where {T} = Base.cconvert(Ptr{T}, A.parent)
-Base.cconvert(::Type{Ptr{T}}, A::Transpose{<:Any, <:AbstractVecOrMat}) where {T} = Base.cconvert(Ptr{T}, A.parent)
+Base.cconvert(::Type{Ptr{T}}, A::Adjoint{<:Real,<:AbstractVecOrMat}) where {T} = Base.cconvert(Ptr{T}, A.parent)
+Base.cconvert(::Type{Ptr{T}}, A::Transpose{<:Any,<:AbstractVecOrMat}) where {T} = Base.cconvert(Ptr{T}, A.parent)
 
-Base.elsize(::Type{<:Adjoint{<:Real, P}}) where {P<:AbstractVecOrMat} = Base.elsize(P)
-Base.elsize(::Type{<:Transpose{<:Any, P}}) where {P<:AbstractVecOrMat} = Base.elsize(P)
+Base.elsize(::Type{<:Adjoint{<:Real,P}}) where {P<:AbstractVecOrMat} = Base.elsize(P)
+Base.elsize(::Type{<:Transpose{<:Any,P}}) where {P<:AbstractVecOrMat} = Base.elsize(P)
 
 # for vectors, the semantics of the wrapped and unwrapped types differ
 # so attempt to maintain both the parent and wrapper type insofar as possible
@@ -401,15 +401,15 @@ vec(v::AdjointAbsVec{<:Real}) = parent(v)
 Base.reshape(v::TransposeAbsVec{<:Number}, ::Val{1}) = parent(v)
 Base.reshape(v::AdjointAbsVec{<:Real}, ::Val{1}) = parent(v)
 
- # these make eachrow(A') produce simpler views
-@inline Base.unsafe_view(A::Transpose{<:Number, <:AbstractMatrix}, i::Integer, j::AbstractArray) =
+# these make eachrow(A') produce simpler views
+@inline Base.unsafe_view(A::Transpose{<:Number,<:AbstractMatrix}, i::Integer, j::AbstractArray) =
     Base.unsafe_view(parent(A), j, i)
-@inline Base.unsafe_view(A::Transpose{<:Number, <:AbstractMatrix}, i::AbstractArray, j::Integer) =
+@inline Base.unsafe_view(A::Transpose{<:Number,<:AbstractMatrix}, i::AbstractArray, j::Integer) =
     Base.unsafe_view(parent(A), j, i)
 
-@inline Base.unsafe_view(A::Adjoint{<:Real, <:AbstractMatrix}, i::Integer, j::AbstractArray) =
+@inline Base.unsafe_view(A::Adjoint{<:Real,<:AbstractMatrix}, i::Integer, j::AbstractArray) =
     Base.unsafe_view(parent(A), j, i)
-@inline Base.unsafe_view(A::Adjoint{<:Real, <:AbstractMatrix}, i::AbstractArray, j::Integer) =
+@inline Base.unsafe_view(A::Adjoint{<:Real,<:AbstractMatrix}, i::AbstractArray, j::Integer) =
     Base.unsafe_view(parent(A), j, i)
 
 ### concatenation
@@ -443,9 +443,12 @@ function map(f, tv::TransposeAbsVec, tvs::TransposeAbsVec...)
     s = (tv, tvs...)
     transpose(map((xs...) -> transpose(f(transpose.(xs)...)), parent.(s)...))
 end
-quasiparentt(x) = parent(x); quasiparentt(x::Number) = x # to handle numbers in the defs below
-quasiparenta(x) = parent(x); quasiparenta(x::Number) = conj(x) # to handle numbers in the defs below
-quasiparentc(x) = parent(parent(x)); quasiparentc(x::Number) = conj(x) # to handle numbers in the defs below
+quasiparentt(x) = parent(x);
+quasiparentt(x::Number) = x; # to handle numbers in the defs below
+quasiparenta(x) = parent(x);
+quasiparenta(x::Number) = conj(x); # to handle numbers in the defs below
+quasiparentc(x) = parent(parent(x));
+quasiparentc(x::Number) = conj(x); # to handle numbers in the defs below
 broadcast(f, avs::Union{Number,AdjointAbsVec}...) = adjoint(broadcast((xs...) -> adjoint(f(adjoint.(xs)...)), quasiparenta.(avs)...))
 broadcast(f, tvs::Union{Number,TransposeAbsVec}...) = transpose(broadcast((xs...) -> transpose(f(transpose.(xs)...)), quasiparentt.(tvs)...))
 # Hack to preserve behavior after #32122; this needs to be done with a broadcast style instead to support dotted fusion
@@ -461,39 +464,39 @@ Broadcast.broadcast_preserving_zero_d(f, tvs::Union{Number,Adjoint{<:Any,<:Trans
 ### reductions
 # faster to sum the Array than to work through the wrapper (but only in commutative reduction ops as in Base/permuteddimsarray.jl)
 Base._mapreduce_dim(f, op::CommutativeOps, init::Base._InitialValue, A::Transpose, dims::Colon) =
-    Base._mapreduce_dim(f∘transpose, op, init, parent(A), dims)
+    Base._mapreduce_dim(f ∘ transpose, op, init, parent(A), dims)
 Base._mapreduce_dim(f, op::CommutativeOps, init::Base._InitialValue, A::Adjoint, dims::Colon) =
-    Base._mapreduce_dim(f∘adjoint, op, init, parent(A), dims)
+    Base._mapreduce_dim(f ∘ adjoint, op, init, parent(A), dims)
 # in prod, use fast path only in the commutative case to avoid surprises
 Base._mapreduce_dim(f::typeof(identity), op::Union{typeof(*),typeof(Base.mul_prod)}, init::Base._InitialValue, A::Transpose{<:Union{Real,Complex}}, dims::Colon) =
-    Base._mapreduce_dim(f∘transpose, op, init, parent(A), dims)
+    Base._mapreduce_dim(f ∘ transpose, op, init, parent(A), dims)
 Base._mapreduce_dim(f::typeof(identity), op::Union{typeof(*),typeof(Base.mul_prod)}, init::Base._InitialValue, A::Adjoint{<:Union{Real,Complex}}, dims::Colon) =
-    Base._mapreduce_dim(f∘adjoint, op, init, parent(A), dims)
+    Base._mapreduce_dim(f ∘ adjoint, op, init, parent(A), dims)
 # count allows for optimization only if the parent array has Bool eltype
 Base._count(::typeof(identity), A::Transpose{Bool}, ::Colon, init) = Base._count(identity, parent(A), :, init)
 Base._count(::typeof(identity), A::Adjoint{Bool}, ::Colon, init) = Base._count(identity, parent(A), :, init)
-Base._any(f, A::Transpose, ::Colon) = Base._any(f∘transpose, parent(A), :)
-Base._any(f, A::Adjoint, ::Colon) = Base._any(f∘adjoint, parent(A), :)
-Base._all(f, A::Transpose, ::Colon) = Base._all(f∘transpose, parent(A), :)
-Base._all(f, A::Adjoint, ::Colon) = Base._all(f∘adjoint, parent(A), :)
+Base._any(f, A::Transpose, ::Colon) = Base._any(f ∘ transpose, parent(A), :)
+Base._any(f, A::Adjoint, ::Colon) = Base._any(f ∘ adjoint, parent(A), :)
+Base._all(f, A::Transpose, ::Colon) = Base._all(f ∘ transpose, parent(A), :)
+Base._all(f, A::Adjoint, ::Colon) = Base._all(f ∘ adjoint, parent(A), :)
 # sum(A'; dims)
 Base.mapreducedim!(f, op::CommutativeOps, B::AbstractArray, A::TransposeAbsMat) =
-    (Base.mapreducedim!(f∘transpose, op, switch_dim12(B), parent(A)); B)
+    (Base.mapreducedim!(f ∘ transpose, op, switch_dim12(B), parent(A)); B)
 Base.mapreducedim!(f, op::CommutativeOps, B::AbstractArray, A::AdjointAbsMat) =
-    (Base.mapreducedim!(f∘adjoint, op, switch_dim12(B), parent(A)); B)
+    (Base.mapreducedim!(f ∘ adjoint, op, switch_dim12(B), parent(A)); B)
 Base.mapreducedim!(f::typeof(identity), op::Union{typeof(*),typeof(Base.mul_prod)}, B::AbstractArray, A::TransposeAbsMat{<:Union{Real,Complex}}) =
-    (Base.mapreducedim!(f∘transpose, op, switch_dim12(B), parent(A)); B)
+    (Base.mapreducedim!(f ∘ transpose, op, switch_dim12(B), parent(A)); B)
 Base.mapreducedim!(f::typeof(identity), op::Union{typeof(*),typeof(Base.mul_prod)}, B::AbstractArray, A::AdjointAbsMat{<:Union{Real,Complex}}) =
-    (Base.mapreducedim!(f∘adjoint, op, switch_dim12(B), parent(A)); B)
+    (Base.mapreducedim!(f ∘ adjoint, op, switch_dim12(B), parent(A)); B)
 
 switch_dim12(B::AbstractVector) = permutedims(B)
 switch_dim12(B::AbstractVector{<:Number}) = transpose(B) # avoid allocs due to permutedims
 switch_dim12(B::AbstractArray{<:Any,0}) = B
-switch_dim12(B::AbstractArray) = PermutedDimsArray(B, (2, 1, ntuple(Base.Fix1(+,2), ndims(B) - 2)...))
+switch_dim12(B::AbstractArray) = PermutedDimsArray(B, (2, 1, ntuple(Base.Fix1(+, 2), ndims(B) - 2)...))
 
 ### linear algebra
 
-(-)(A::Adjoint)   = Adjoint(  -A.parent)
+(-)(A::Adjoint) = Adjoint(-A.parent)
 (-)(A::Transpose) = Transpose(-A.parent)
 
 tr(A::Adjoint) = adjoint(tr(parent(A)))
@@ -509,7 +512,7 @@ function _dot_nonrecursive(u, v)
     if lu == 0
         zero(eltype(u)) * zero(eltype(v))
     else
-        sum(uu*vv for (uu, vv) in zip(u, v))
+        sum(uu * vv for (uu, vv) in zip(u, v))
     end
 end
 
@@ -530,13 +533,13 @@ lmul!(s::Number, X::Adjoint) = (rmul!(parent(X), s'); X)
 # AdjOrTransAbsVec{<:Any,<:AdjOrTransAbsVec} is a lazy conj vectors
 # We need to expand the combinations to avoid ambiguities
 (*)(u::TransposeAbsVec, v::AdjointAbsVec{<:Any,<:TransposeAbsVec}) = _dot_nonrecursive(u, v)
-(*)(u::AdjointAbsVec,   v::AdjointAbsVec{<:Any,<:TransposeAbsVec}) = _dot_nonrecursive(u, v)
+(*)(u::AdjointAbsVec, v::AdjointAbsVec{<:Any,<:TransposeAbsVec}) = _dot_nonrecursive(u, v)
 (*)(u::TransposeAbsVec, v::TransposeAbsVec{<:Any,<:AdjointAbsVec}) = _dot_nonrecursive(u, v)
-(*)(u::AdjointAbsVec,   v::TransposeAbsVec{<:Any,<:AdjointAbsVec}) = _dot_nonrecursive(u, v)
+(*)(u::AdjointAbsVec, v::TransposeAbsVec{<:Any,<:AdjointAbsVec}) = _dot_nonrecursive(u, v)
 
 ## pseudoinversion
-pinv(v::AdjointAbsVec, tol::Real = 0) = pinv(v.parent, tol).parent
-pinv(v::TransposeAbsVec, tol::Real = 0) = pinv(conj(v.parent)).parent
+pinv(v::AdjointAbsVec, tol::Real=0) = pinv(v.parent, tol).parent
+pinv(v::TransposeAbsVec, tol::Real=0) = pinv(conj(v.parent)).parent
 
 
 ## left-division \
@@ -554,7 +557,7 @@ conj(A::Transpose) = adjoint(A.parent)
 conj(A::Adjoint) = transpose(A.parent)
 
 ## structured matrix methods ##
-function Base.replace_in_print_matrix(A::AdjOrTrans,i::Integer,j::Integer,s::AbstractString)
+function Base.replace_in_print_matrix(A::AdjOrTrans, i::Integer, j::Integer, s::AbstractString)
     Base.replace_in_print_matrix(parent(A), j, i, s)
 end
 
@@ -575,12 +578,12 @@ Compute `vec(adjoint(A))`, but avoid an allocating reshape if possible
 _vecadjoint(A::AbstractVector) = vec(adjoint(A))
 _vecadjoint(A::Base.ReshapedArray{<:Any,1,<:AdjointAbsVec}) = adjoint(parent(A))
 
-diagview(A::Transpose, k::Integer = 0) = _vectranspose(diagview(parent(A), -k))
-diagview(A::Adjoint, k::Integer = 0) = _vecadjoint(diagview(parent(A), -k))
+diagview(A::Transpose, k::Integer=0) = _vectranspose(diagview(parent(A), -k))
+diagview(A::Adjoint, k::Integer=0) = _vecadjoint(diagview(parent(A), -k))
 
 # triu and tril
-triu!(A::AdjOrTransAbsMat, k::Integer = 0) = wrapperop(A)(tril!(parent(A), -k))
-tril!(A::AdjOrTransAbsMat, k::Integer = 0) = wrapperop(A)(triu!(parent(A), -k))
+triu!(A::AdjOrTransAbsMat, k::Integer=0) = wrapperop(A)(tril!(parent(A), -k))
+tril!(A::AdjOrTransAbsMat, k::Integer=0) = wrapperop(A)(triu!(parent(A), -k))
 
 function fillstored!(A::AdjOrTransAbsMat, v)
     fillstored!(parent(A), wrapperop(A)(v))
